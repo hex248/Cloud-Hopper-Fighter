@@ -34,7 +34,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] LayerMask groundLayer;
     [SerializeField] float groundDrag = 0.5f;
     [SerializeField] Transform orientation;
-    [SerializeField] float rotationSmoothing = 0.1f;
+    [SerializeField][Range(0.0f,1.0f)] float rotationSmoothing = 0.5f;
     bool grounded;
     bool canJump;
 
@@ -42,6 +42,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("Animation")]
     [SerializeField] Animator animator;
+    [SerializeField] GameObject model;
 
 
 
@@ -56,7 +57,6 @@ public class PlayerController : MonoBehaviour
 
         if (grounded) rb.drag = groundDrag;
         else rb.drag = 0;
-
 
         if (grounded)
         {
@@ -80,14 +80,13 @@ public class PlayerController : MonoBehaviour
             rb.velocity = new Vector3(limitedVelocity.x, rb.velocity.y, limitedVelocity.z);
         }
 
-
-
         if (moveDirection != Vector3.zero) desiredRotation = Quaternion.LookRotation(moveDirection, Vector3.up);
-        transform.rotation = Quaternion.Lerp(transform.rotation, desiredRotation, rotationSmoothing);
-
-        if (Input.GetAxisRaw("Jump") > 0 && canJump) Jump();
+        model.transform.rotation = Quaternion.Lerp(model.transform.rotation, desiredRotation, ((1.0f - rotationSmoothing) * Time.deltaTime) * 20.0f);
 
         animator.SetBool("moving", moveDirection != Vector3.zero);
+
+        //if (Input.GetAxisRaw("Jump") > 0 && canJump) Jump();
+
 
         // old movement system
         #region
