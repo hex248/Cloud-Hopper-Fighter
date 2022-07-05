@@ -34,7 +34,7 @@ public class ScreenManager : MonoBehaviour
         }
     }
 
-    void UpdateSplitScreen()
+    public void UpdateSplitScreen()
     {
         for (int i = 0; i < screenTypes.Length; i++)
         {

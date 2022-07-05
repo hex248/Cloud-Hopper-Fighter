@@ -14,4 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attackName: Punch
   damage: 30
-  duration: 0.5
+  hitDuration: 0.2
+  cooldown: 0.3

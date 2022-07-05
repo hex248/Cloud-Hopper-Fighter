@@ -164,28 +164,6 @@
                     "isPartOfComposite": true
                 },
                 {
-                    "name": "Keyboard 2",
-                    "id": "e6d2adbb-626b-478a-a308-7359e3735277",
-                    "path": "2DVector",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Movement",
-                    "isComposite": true,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "Keyboard 3",
-                    "id": "516a3fc1-5b4f-40e5-8082-72d7689c2406",
-                    "path": "2DVector",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Movement",
-                    "isComposite": true,
-                    "isPartOfComposite": false
-                },
-                {
                     "name": "",
                     "id": "0f817eb9-25b6-4e14-b364-7481627fe070",
                     "path": "<Mouse>/leftButton",

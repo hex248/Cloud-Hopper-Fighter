@@ -7,5 +7,6 @@ public class Attack : ScriptableObject
 {
     public string attackName = "";
     public int damage = 0;
-    public float duration = 0.0f;
+    public float hitDuration = 0.0f;
+    public float cooldown = 0.0f;
 }

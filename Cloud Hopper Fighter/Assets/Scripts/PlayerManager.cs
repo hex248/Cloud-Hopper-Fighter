@@ -54,4 +54,15 @@ public class PlayerManager : MonoBehaviour
                 break;
         }
     }
+
+    public void KillPlayer(int playerNumber)
+    {
+        // show player death screen
+
+        Destroy(players[playerNumber - 1].gameObject);
+        players.Remove(players[playerNumber - 1]);
+        playerCount--;
+        // update screens
+        screenManager.UpdateSplitScreen();
+    }
 }

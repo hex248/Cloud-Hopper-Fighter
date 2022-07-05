@@ -29,6 +29,7 @@ public class PlayerController : MonoBehaviour
 
     public int playerNumber;
     [SerializeField] public Camera camera;
+    ScreenManager screenManager;
 
     [Header("Movement")]
     [SerializeField] float moveSpeed = 5.0f;
@@ -60,6 +61,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("Combat")]
     [SerializeField] public bool attacking;
+    [SerializeField] public bool canAttack = true;
     [SerializeField] public Attack currentAttack;
     public bool hitPlayer = false;
     public int health = 100;
@@ -72,6 +74,7 @@ public class PlayerController : MonoBehaviour
         playerInputManager = FindObjectOfType<PlayerInputManager>();
         playerNumber = playerInput.playerIndex + 1;
         playerManager.PlayerSpawned(this);
+        screenManager = FindObjectOfType<ScreenManager>();
         transform.position = spawnPosition + new Vector3(playerNumber * spawnSpacing, 0, -playerNumber * spawnSpacing);
     }
 
@@ -91,12 +94,8 @@ public class PlayerController : MonoBehaviour
             canJump = false;
         }
 
-        if (vertical > 0.5f) vertical = 1.0f;
-        else if (vertical < -0.5f) vertical = -1.0f;
-        else vertical = 0.0f;
-        if (horizontal > 0.5f) horizontal = 1.0f;
-        else if (horizontal < -0.5f) horizontal = -1.0f;
-        else horizontal = 0.0f;
+        vertical = Mathf.Round(vertical);
+        horizontal = Mathf.Round(horizontal);
 
         Vector3 moveDirection = orientation.forward * vertical + orientation.right * horizontal;
 
@@ -133,11 +132,12 @@ public class PlayerController : MonoBehaviour
 
     public void OnPunch(InputAction.CallbackContext context)
     {
-        if (attacking) return; // only allow one attack at a time
+        if (!canAttack) return; // only allow one attack at a time
         attacking = true;
+        canAttack = false;
         currentAttack = playerManager.attacks.Find(attack => attack.attackName == "Punch");
         animator.SetTrigger("punch");
-        StartCoroutine(StartAttackTimer(currentAttack.duration));
+        StartCoroutine(StartAttackTimer(currentAttack.hitDuration, currentAttack.cooldown));
     }
 
     public bool IsValidQuaternion(Quaternion q)
@@ -156,23 +156,24 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    IEnumerator StartAttackTimer(float duration)
+    IEnumerator StartAttackTimer(float hitDuration, float cooldown)
     {
-        yield return new WaitForSeconds(duration);
+        yield return new WaitForSeconds(hitDuration);
         attacking = false;
+        yield return new WaitForSeconds(cooldown);
+        canAttack = true;
         hitPlayer = false;
         yield return null;
     }
 
-    public void Die()
+    public IEnumerator Die()
     {
         // play death animation
+        animator.SetTrigger("death");
 
-        // make player leave using playerInputManager
+        // kill player using PlayerManager
+        playerManager.KillPlayer(playerNumber);
 
-        // show player death screen
-
-        // update screens
-        
+        yield return null;
     }
 }

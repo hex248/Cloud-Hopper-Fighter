@@ -1472,22 +1472,6 @@ MonoBehaviour:
         m_Groups: 
         m_Action: Join
         m_Flags: 0
-      - m_Name: 
-        m_Id: 9f1c0d51-eb28-41f7-97f2-4819c4e5d8a9
-        m_Path: <Keyboard>/rightCtrl
-        m_Interactions: 
-        m_Processors: 
-        m_Groups: 
-        m_Action: Join
-        m_Flags: 0
-      - m_Name: 
-        m_Id: 1494c6fd-3e73-49cc-a068-923066b46ab7
-        m_Path: <Keyboard>/rightAlt
-        m_Interactions: 
-        m_Processors: 
-        m_Groups: 
-        m_Action: Join
-        m_Flags: 0
     m_Reference: {fileID: 0}
   m_PlayerPrefab: {fileID: 1910360577526286676, guid: 16d734b0253f8ca4a85df6e87bc93151, type: 3}
   m_SplitScreen: 0
