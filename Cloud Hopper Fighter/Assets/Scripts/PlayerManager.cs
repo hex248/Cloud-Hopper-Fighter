@@ -32,6 +32,11 @@ public class PlayerManager : MonoBehaviour
         StartCoroutine(screenManager.PlayerJoined(playerCount));
         player.model.GetComponentInChildren<Renderer>().material = playerMaterials[player.playerNumber - 1];
 
+        UpdateRenderTextures();
+    }
+
+    public void UpdateRenderTextures()
+    {
         switch (playerCount)
         {
             case 1:
@@ -53,16 +58,5 @@ public class PlayerManager : MonoBehaviour
                 players[3].camera.targetTexture = normalRenderTextures[3];
                 break;
         }
-    }
-
-    public void KillPlayer(int playerNumber)
-    {
-        // show player death screen
-
-        Destroy(players[playerNumber - 1].gameObject);
-        players.Remove(players[playerNumber - 1]);
-        playerCount--;
-        // update screens
-        screenManager.UpdateSplitScreen();
     }
 }

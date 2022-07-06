@@ -42,6 +42,10 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] Vector3 spawnPosition;
     [SerializeField] float spawnSpacing;
+
+    [SerializeField] LayerMask playerLayer;
+    [SerializeField] LayerMask noCollisionLayer;
+
     bool grounded;
     bool canJump;
 
@@ -66,6 +70,9 @@ public class PlayerController : MonoBehaviour
     public bool hitPlayer = false;
     public int health = 100;
 
+    public bool lockedInput = false;
+    public bool waitingForRespawn = true;
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -85,7 +92,7 @@ public class PlayerController : MonoBehaviour
         if (grounded) rb.drag = groundDrag;
         else rb.drag = 0;
 
-        if (grounded)
+        if (grounded && !lockedInput)
         {
             canJump = true;
         }
@@ -93,27 +100,29 @@ public class PlayerController : MonoBehaviour
         {
             canJump = false;
         }
-
-        vertical = Mathf.Round(vertical);
-        horizontal = Mathf.Round(horizontal);
-
-        Vector3 moveDirection = orientation.forward * vertical + orientation.right * horizontal;
-
-        float speed = grounded ? moveSpeed : moveSpeed * airMultiplier;
-        rb.AddForce(moveDirection.normalized * speed, ForceMode.Force);
-
-        Vector3 flatVelocity = new Vector3(rb.velocity.x, 0.0f, rb.velocity.z);
-
-        if (flatVelocity.magnitude > moveSpeed)
+        if (!lockedInput)
         {
-            Vector3 limitedVelocity = flatVelocity.normalized * moveSpeed;
-            rb.velocity = new Vector3(limitedVelocity.x, rb.velocity.y, limitedVelocity.z);
+            vertical = Mathf.Round(vertical);
+            horizontal = Mathf.Round(horizontal);
+
+            Vector3 moveDirection = orientation.forward * vertical + orientation.right * horizontal;
+
+            float speed = grounded ? moveSpeed : moveSpeed * airMultiplier;
+            rb.AddForce(moveDirection.normalized * speed, ForceMode.Force);
+
+            Vector3 flatVelocity = new Vector3(rb.velocity.x, 0.0f, rb.velocity.z);
+
+            if (flatVelocity.magnitude > moveSpeed)
+            {
+                Vector3 limitedVelocity = flatVelocity.normalized * moveSpeed;
+                rb.velocity = new Vector3(limitedVelocity.x, rb.velocity.y, limitedVelocity.z);
+            }
+
+            if (moveDirection != Vector3.zero) desiredRotation = Quaternion.LookRotation(moveDirection, Vector3.up);
+            if (IsValidQuaternion(desiredRotation)) model.transform.rotation = Quaternion.Lerp(model.transform.rotation, desiredRotation, ((10.0f - rotationSmoothing) * Time.deltaTime));
+
+            animator.SetBool("moving", moveDirection != Vector3.zero);
         }
-
-        if (moveDirection != Vector3.zero) desiredRotation = Quaternion.LookRotation(moveDirection, Vector3.up);
-        if (IsValidQuaternion(desiredRotation)) model.transform.rotation = Quaternion.Lerp(model.transform.rotation, desiredRotation, ((10.0f - rotationSmoothing) * Time.deltaTime));
-
-        animator.SetBool("moving", moveDirection != Vector3.zero);
     }
 
     public void OnMove(InputAction.CallbackContext context)
@@ -140,6 +149,17 @@ public class PlayerController : MonoBehaviour
         StartCoroutine(StartAttackTimer(currentAttack.hitDuration, currentAttack.cooldown));
     }
 
+    public void OnRespawn(InputAction.CallbackContext context)
+    {
+        gameObject.layer = playerLayer;
+        animator.Rebind();
+        animator.Update(0f);
+        lockedInput = false;
+        waitingForRespawn = false;
+        // hide dead overlay
+
+    }
+
     public bool IsValidQuaternion(Quaternion q)
     {
         return q.x == 0 && q.y == 0 && q.z == 0 && q.w == 0 ? false : true;
@@ -152,7 +172,7 @@ public class PlayerController : MonoBehaviour
         health -= attack.damage;
         if (health <= 0)
         {
-            Die();
+            StartCoroutine(Die());
         }
     }
 
@@ -171,8 +191,16 @@ public class PlayerController : MonoBehaviour
         // play death animation
         animator.SetTrigger("death");
 
-        // kill player using PlayerManager
-        playerManager.KillPlayer(playerNumber);
+        // lock input
+        lockedInput = true;
+        gameObject.layer = noCollisionLayer;
+        yield return new WaitForSeconds(2.5f);
+
+        // show dead overlay
+
+
+        // wait to respawn
+        waitingForRespawn = true;
 
         yield return null;
     }
