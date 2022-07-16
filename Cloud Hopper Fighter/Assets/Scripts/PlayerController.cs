@@ -37,7 +37,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] [Range(0.0f, 100.0f)] float jumpForce= 50.0f;
     [SerializeField] LayerMask groundLayer;
     [SerializeField] float groundDrag = 0.5f;
-    [SerializeField] Transform orientation;
+    [SerializeField] GameObject orientationObject;
+    Transform orientation;
     [SerializeField][Range(0.0f, 10.0f)] float rotationSmoothing = 2.0f;
 
     [SerializeField] Vector3 spawnPosition;
@@ -75,6 +76,7 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
+        orientation = orientationObject.transform;
         rb = GetComponent<Rigidbody>();
         playerInput = GetComponent<PlayerInput>();
         playerManager = FindObjectOfType<PlayerManager>();
